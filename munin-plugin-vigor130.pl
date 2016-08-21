@@ -82,7 +82,7 @@ if (defined($ENV{'password'})) { $password = $ENV{'password'} }
 if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   
   print("multigraph vig130_datarates\n");
-  print("graph_category network\n");
+  print("graph_category VDSL\n");
   print("graph_title VDSL Data Rate\n");
   print("graph_args --lower-limit 0\n");
   print("graph_vlabel kbps\n");
@@ -104,32 +104,35 @@ if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   print("curuprate.info This is the current upstream rate at which the modem communicates with the DSLAM.\n");
   
   print("multigraph vig130_snrmargins\n");
-  print("graph_category network\n");
+  print("graph_category VDSL\n");
   print("graph_title SNR margins\n");
   print("graph_vlabel dB\n");
   print("snrmargindn.label downstream snr margin\n");
   print("snrmargindn.type GAUGE\n");
-  print("snrmargindn.draw LINE1.5\n");
+  print("snrmargindn.draw LINE2.0\n");
   print("snrmargindn.info The current SNR margin for the downstream. SNR margin is the difference between the current SNR value and the minimum SNR value required to sync, so a higher value means a more stable connection.\n");
   print("snrmarginup.label upstream snr margin\n");
   print("snrmarginup.type GAUGE\n");
-  print("snrmarginup.draw LINE1.5\n");
+  print("snrmarginup.draw LINE2.0\n");
   print("snrmarginup.info The current SNR margin for the upstream.\n");
   
   print("multigraph vig130_attenuation\n");
-  print("graph_category network\n");
+  print("graph_category VDSL\n");
   print("graph_title attenuation\n");
   print("graph_vlabel dB\n");
   print("attenuationdn.label attenuation downstream\n");
   print("attenuationdn.type GAUGE\n");
-  print("attenuationdn.draw LINE1.5\n");
+  print("attenuationdn.draw LINE2.0\n");
   print("attenuationdn.info The attenuation on the downstream. Attenuation is how much signal strength is lost on the line, lower is better.\n");
   print("attenuationup.label attenuation upstream\n");
   print("attenuationup.type GAUGE\n");
-  print("attenuationup.draw LINE1.5\n");
+  print("attenuationup.draw LINE2.0\n");
   print("attenuationup.info The attenuation on the upstream.\n");
   
-  #print("snrmargindn.info PSD is the power spectrum density but si\n");
+  # PSD should be constant unless the profile on the DSLAM is changed.
+  # It also isn't clear how this value is corrected, as it has to be an average
+  # over a lot of values? Lets not draw it for now.
+  #print("snrmargindn.info PSD is the power spectrum density\n");
   
   exit(0);
 }
