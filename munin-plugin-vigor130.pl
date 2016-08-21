@@ -267,7 +267,7 @@ if ($dslsp =~ m!Attenuation</td><td>(.*?)</td><td>.*?</td><td>(.*?)</td>!) {
   $attenuationdn = $1;
   $attenuationup = $2;
 }
-if ($dslsp =~ m!<td>CRC</td><td>(.*?)</td><td>.*?</td><td>(.*?)</td>!) {
+if ($dslsp =~ m!<td>CRC</td><td>(.*?)</td><td>(.*?)</td>!) { # different because of colspan=2!
   $crcerrsdn = int($1);
   $crcerrsup = int($2);
 }
