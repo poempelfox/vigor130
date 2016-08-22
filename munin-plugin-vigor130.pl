@@ -16,9 +16,7 @@ my $timeout = 15; # the LWP default of 180 secs would be way too long
 # ----------------------------------------------------------------------------
 
 use LWP::UserAgent;
-use HTTP::Cookies;
 use MIME::Base64 qw/encode_base64/;
-use HTML::TableExtract;
 
 # Par. 0: Hostname/IP
 # Par. 1: Username
