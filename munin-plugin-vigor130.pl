@@ -1,9 +1,19 @@
 #!/usr/bin/perl -w
 
+# You should put a symlink to this plugin under the name
+#  SOMETHING_HOSTNAME-OR-IP, e.g. vdslstats_10.10.1.1
+# into the munin plugindir. HOSTNAME-OR-IP should be the IP of the modem.
+# Alternatively, you can use environment variables to configure this script.
+# The following variables are supported:
+#   hostname      Hostname or IP of the modem  (default: 192.168.1.1)
+#   username      Username for login to the modem (default: admin)
+#   password      Password for login to the modem (default: admin)
+
 # Some tuneables:
 # Timeout for requests.
 my $timeout = 15; # the LWP default of 180 secs would be way too long
 
+# ----------------------------------------------------------------------------
 
 use LWP::UserAgent;
 use HTTP::Cookies;
