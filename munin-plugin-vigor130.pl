@@ -18,6 +18,8 @@ my $timeout = 15; # the LWP default of 180 secs would be way too long
 use LWP::UserAgent;
 use MIME::Base64 qw/encode_base64/;
 
+$randomchars = ( '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' );
+
 # Par. 0: Hostname/IP
 # Par. 1: Username
 # Par. 2: Password
@@ -27,11 +29,23 @@ sub getdslstatuspage($$$) {
   my $un = shift();
   my $pw = shift();
 
+  # Lets generate us a nice random formauthstring. The modem uses that as a
+  # CSRF protection, and we have to send one, an empty one will fail in weird
+  # places. We just set this ourselves on login and have to echo it back with
+  # subsequent requests.
+  my $formauthstring = '';
+  for ($i = 0; $i < 15; $i++) {
+    $formauthstring .= substr($randomchars, int(rand(length($randomchars))), 1);
+  }
+
   my $ua = LWP::UserAgent->new();
   $ua->agent($0);
   $ua->timeout($timeout);
+  $ua->requests_redirectable([]); # Do not automatically follow redirects
   # Create a request
-  my %frm = ( 'aa' => encode_base64($un, ''), 'ab' => encode_base64($pw, '') );
+  my %frm = ( 'aa' => encode_base64($un, ''),
+              'ab' => encode_base64($pw, ''),
+              'sFormAuthStr' => $formauthstring);
   # Pass request to the user agent and get a response back
   my $res = $ua->post("http://${hn}/cgi-bin/wlogin.cgi", \%frm);
   # Check the outcome of the response. It has to be a redirect to /
@@ -54,22 +68,28 @@ sub getdslstatuspage($$$) {
   }
   my $authcookie = $1;
   #print("Obtained auth cookie $authcookie\n");
+  # Now call the script that updates the status
+  $res = $ua->get("http://${hn}/cgi-bin/V2X00.cgi?sFormAuthStr=${formauthstring}&fid=2356",
+                  "Cookie" => "SESSION_ID_VIGOR=${authcookie}");
+  unless ($res->is_redirect()) {
+    print("# WARNING calling update-script failed, something is probably wrong.\n");
+  }
+  # http://vdslmodem.poempelfox.de/cgi-bin/V2X00.cgi?sFormAuthStr=dyjWPerbzbkS4zz&fid=2356
   $res = $ua->get("http://${hn}/doc/dslstatus.sht",
                   "Cookie" => "SESSION_ID_VIGOR=${authcookie}");
   unless ($res->is_success()) {
-    print("# ERROR fetching status info (1)\n");
+    print("# ERROR fetching status info (2)\n");
     return undef;
   }
   my $rv = $res->content();
   # Now try to log out. We don't really care if it succeeds or not, we just
   # try not to leave session ids behind that might take up memory on the modem.
-  # FIXME: doesn't work, probably because we would need to send sFormAuthStr
-  #$res = $ua->get("http://${hn}/cgi-bin/wlogout.cgi",
-  #                "Cookie" => "SESSION_ID_VIGOR=${authcookie}");
-  #unless (defined($res->header('Set-Cookie'))) {
-  #  print("# WARNING failed to log out of modem webinterface (1)\n");
-  #  print($res->content());
-  #}
+  $res = $ua->get("http://${hn}/cgi-bin/wlogout.cgi?sFormAuthStr=${formauthstring}",
+                  "Cookie" => "SESSION_ID_VIGOR=${authcookie}");
+  unless (defined($res->header('Set-Cookie'))) {
+    print("# WARNING failed to log out of modem webinterface (1)\n");
+    print($res->content());
+  }
   return $rv;
 }
 
@@ -92,7 +112,7 @@ if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   print("multigraph vig130_datarates\n");
   print("graph_category VDSL\n");
   print("graph_title VDSL Data Rate\n");
-  print("graph_args --lower-limit 0\n");
+  print("graph_args --base 1000 --lower-limit 0\n");
   print("graph_vlabel bps\n");
   print("attdnrate.label attainable downstream rate\n");
   print("attdnrate.type GAUGE\n");
@@ -239,6 +259,9 @@ unless (defined($dslsp)) {
 $dslsp =~ s/(<[a-zA-Z]*) (.*?)>/$1>/sg;
 $dslsp =~ s|.*?<table>(.*)</table>.*|$1|sgi;
 $dslsp =~ s|</{0,1}font>||g;
+if (defined($ENV{'VERBOSE'}) && ($ENV{'VERBOSE'} eq '1')) {
+  print("$dslsp\n");
+}
 my $curdnrate = 'U';
 my $curuprate = 'U';
 my $attdnrate = 'U';
@@ -260,12 +283,12 @@ my $lossup = 'U';
 my $uasdn = 'U';
 my $uasup = 'U';
 if ($dslsp =~ m!Attainable Rate</td><td>(.*?)</td><td>.*?</td><td>(.*?)</td>!) {
-  $attdnrate = int($1);
-  $attuprate = int($2);
+  $attdnrate = int($1) * 1000;
+  $attuprate = int($2) * 1000;
 }
 if ($dslsp =~ m!Actual Rate</td><td>(.*?)</td><td>.*?</td><td>(.*?)</td>!) {
-  $curdnrate = int($1);
-  $curuprate = int($2);
+  $curdnrate = int($1) * 1000;
+  $curuprate = int($2) * 1000;
 }
 if ($dslsp =~ m!SNR Margin</td><td>(.*?)</td><td>.*?</td><td>(.*?)</td>!) {
   $snrmargindn = $1;
