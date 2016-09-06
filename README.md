@@ -13,4 +13,5 @@ and actually gets disturbance from other lines...
 
 ![example datarate graph](img/vig130_datarates-day.png)
 ![example error graph](img/vig130_errors1_dn-day.png)
+![example SNR margin graph](img/vig130_snrmargins-week.png)
 
