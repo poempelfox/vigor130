@@ -3,11 +3,22 @@
 # You should put a symlink to this plugin under the name
 #  SOMETHING_HOSTNAME-OR-IP, e.g. vdslstats_10.10.1.1
 # into the munin plugindir. HOSTNAME-OR-IP should be the IP of the modem.
+# 
+# Important: make sure to use the same names in your symlinks and other config places!
+# 
 # Alternatively, you can use environment variables to configure this script.
 # The following variables are supported:
 #   hostname      Hostname or IP of the modem  (default: 192.168.1.1)
 #   username      Username for login to the modem (default: admin)
 #   password      Password for login to the modem (default: admin)
+#
+# In /etc/munin/munin.conf add them as new virtual nodes:
+# 
+# [10.10.1.1]
+#     address 127.0.0.1
+# 
+# [HOSTNAME-OR-IP]
+#     address 127.0.0.1 
 
 # Some tuneables:
 # Timeout for requests.
@@ -110,6 +121,7 @@ if (defined($ENV{'password'})) { $password = $ENV{'password'} }
 if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   
   print("multigraph vig130_datarates\n");
+  print "host_name " . $hostname . "\n";
   print("graph_category VDSL\n");
   print("graph_title VDSL Data Rate\n");
   print("graph_args --base 1000 --lower-limit 0\n");
@@ -132,6 +144,7 @@ if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   print("curuprate.info This is the current upstream rate at which the modem communicates with the DSLAM.\n");
   
   print("multigraph vig130_snrmargins\n");
+  print "host_name " . $hostname . "\n";
   print("graph_category VDSL\n");
   print("graph_title SNR margins\n");
   print("graph_vlabel dB\n");
@@ -145,6 +158,7 @@ if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   print("snrmarginup.info The current SNR margin for the upstream.\n");
   
   print("multigraph vig130_attenuation\n");
+  print "host_name " . $hostname . "\n";
   print("graph_category VDSL\n");
   print("graph_title attenuation\n");
   print("graph_vlabel dB\n");
@@ -161,6 +175,7 @@ if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   # all will probably scale wrong. Also, their proportions will depend on the
   # actual line. It might not be possible to combine those all into one graph.
   print("multigraph vig130_errors1_dn\n");
+  print "host_name " . $hostname . "\n";
   print("graph_category VDSL\n");
   print("graph_title VDSL Errors Downstream\n");
   print("graph_vlabel n\n");
@@ -204,6 +219,7 @@ if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
   print("uasdn.info The number of UAS (UnAvailable Seconds) on the downstream\n");
   
   print("multigraph vig130_errors1_up\n");
+  print "host_name " . $hostname . "\n";
   print("graph_category VDSL\n");
   print("graph_title VDSL Errors Upstream\n");
   print("graph_vlabel n\n");
