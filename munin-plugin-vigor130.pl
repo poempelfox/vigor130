@@ -1,9 +1,24 @@
 #!/usr/bin/perl -w
 
-# You should put a symlink to this plugin under the name
+# You should put a symlink to this plugin into the munin plugindir.
+#
+# If you want to show the modem status under the hostname of your router,
+# the name of the symlink should be formed like this:
 #  SOMETHING_HOSTNAME-OR-IP, e.g. vdslstats_10.10.1.1
-# into the munin plugindir. HOSTNAME-OR-IP should be the IP of the modem.
-# Alternatively, you can use environment variables to configure this script.
+# HOSTNAME-OR-IP should be the IP of the modem.
+# Note: In this case you can only feed info from one modem per host into munin.
+#
+# If you want to show the modem status as an individual host in munin instead,
+# use the following naming scheme for the symlink instead:
+#  HOSTNAME-OR-IP_SOMETHING,  e.g. 10.10.1.1_vdslstats
+# In this case you will also have to configure your munin-server accordingly to
+# query the new "host" (called virtual node in munin lingo).
+#
+# You can use environment variables to configure this script - you'll
+# definitely need to do that if you changed the default username/password
+# on the modem. This has to go into the munin plugin configuration on the host
+# where this script will be executed.
+#
 # The following variables are supported:
 #   hostname      Hostname or IP of the modem  (default: 192.168.1.1)
 #   username      Username for login to the modem (default: admin)
@@ -101,13 +116,18 @@ my $progname = $0;
 my $hostname = '192.168.1.1';  # These are the factory defaults of the Vigor 130
 my $username = 'admin';
 my $password = 'admin';
-if ($progname =~ m/.+_(.+)/) {
+my $fakehost = '';
+if ($progname =~ m/([a-zA-Z0-9]+\.[a-zA-Z0-9.]+)_.+/) {
+  $fakehost = $1;
+  $hostname = $1;
+} elsif ($progname =~ m/.+_(.+)/) {
   $hostname = $1;
 }
 if (defined($ENV{'hostname'})) { $hostname = $ENV{'hostname'} }
 if (defined($ENV{'username'})) { $username = $ENV{'username'} }
 if (defined($ENV{'password'})) { $password = $ENV{'password'} }
 if ((@ARGV > 0) && ($ARGV[0] eq "config")) {
+  if (length($fakehost) > 0) { print("host_name $fakehost\n"); }
   
   print("multigraph vig130_datarates\n");
   print("graph_category VDSL\n");
@@ -322,6 +342,7 @@ if ($dslsp =~ m!<td>UAS</td><td>(.*?)</td><td>.*?</td><td>(.*?)</td>!) {
   $uasdn = int($1);
   $uasup = int($2);
 }
+if (length($fakehost) > 0) { print("host_name $fakehost\n"); }
 print("multigraph vig130_datarates\n");
 print("attdnrate.value $attdnrate\n");
 print("attuprate.value $attuprate\n");
