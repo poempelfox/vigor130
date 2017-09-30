@@ -6,12 +6,27 @@ so parsing the data may not work there. YMMV.
 
 License is GPL.
 
-Here are some images showing what graphs it produces. My line is way
-too good so these look extremely dull - I would gladly swap those
-with images from someone who has a line that is longer than 10 meters
-and actually gets disturbance from other lines...
+#### Example images
 
-![example datarate graph](img/vig130_datarates-day.png)
-![example error graph](img/vig130_errors1_dn-day.png)
-![example SNR margin graph](img/vig130_snrmargins-week.png)
+Here are some images showing what graphs it produces.
+
+##### Telekom VDSL
+
+This is a 50 MBit line by Deutsche Telekom, and the graphs show
+some the effects of them replacing some equipment. Thanks to Bianco Veigel
+for the pictures.
+
+![example datarate graph 1](img/bv-vig130_datarates-week.png)
+![example error graph upstream 1](img/bv-vig130_errors1_dn-week.png)
+![example error graph downstream 1](img/bv-vig130_errors1_up-week.png)
+![example SNR margin graph 1](img/bv-vig130_snrmargins-week.png)
+
+##### My own line at home
+
+My line is way too good because it's just some 10 meters into the basement
+(FTTB), so these look extremely dull...
+
+![example datarate graph 2](img/fox-vig130_datarates-day.png)
+![example error graph downstream 2](img/fox-vig130_errors1_dn-day.png)
+![example SNR margin graph 2](img/fox-vig130_snrmargins-week.png)
 
