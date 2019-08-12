@@ -364,7 +364,7 @@ print("uasdn.value $uasdn\n");
 print("multigraph vig130_errors1_up\n");
 print("crcerrsup.value $crcerrsup\n");
 print("fecsup.value $fecsup\n");
-print("esup.value $sesup\n");
+print("esup.value $esup\n");
 print("sesup.value $sesup\n");
 print("lossup.value $lossup\n");
 print("uasup.value $uasup\n");
