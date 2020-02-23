@@ -49,11 +49,11 @@ sub getdslstatuspage($$$) {
   $remote->print($username);
   $remote->waitfor('/Password: /');
   $remote->print($password);
-  $remote->waitfor('/(DrayTek|Vigor)> /');
+  $remote->waitfor('/(DrayTek|Vigor|)> /');
   $remote->print("vdsl status");
-  ($rv1) = $remote->waitfor('/(DrayTek|Vigor)> /');
+  ($rv1) = $remote->waitfor('/(DrayTek|Vigor|)> /');
   $remote->print("vdsl status more");
-  ($rv2) = $remote->waitfor('/(DrayTek|Vigor)> /');
+  ($rv2) = $remote->waitfor('/(DrayTek|Vigor|)> /');
   
   return ($rv1.$rv2);
 }
